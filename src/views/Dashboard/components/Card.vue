@@ -36,7 +36,7 @@ export default {
   display: flex;
   justify-content: space-around;
   align-items: center;
-  background: #d3dce6;
+  background: rgba(255, 255, 255, 0.6);
   padding: 20px 0;
   i {
     font-size: 50px;

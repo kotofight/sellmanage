@@ -1,61 +1,54 @@
 <template>
   <div>
     <el-menu
-      :default-active="$route.path"
+      :default-active="celpath"
       class="el-menu-vertical-demo"
       @open="handleOpen"
       @close="handleClose"
-      background-color="#304156"
+      background-color="#3a6f9c"
       text-color="#fff"
-      active-text-color="#1989fa"
+      active-text-color="#1A3F6E"
       :collapse="isCollapse"
       :collapse-transition="false"
       :router="true"
     >
-      <el-menu-item index="/dashboard">
-        <i class="iconfont icon-shouye"></i>
-        <span slot="title">后台首页</span>
-      </el-menu-item>
-      <el-menu-item index="/order">
-        <i class="iconfont icon-icon-"></i>
-        <span slot="title">订单管理</span>
-      </el-menu-item>
-      <el-submenu index="/pro">
-        <template slot="title">
-          <i class="iconfont icon-shangpin"></i>
-          <span>商品管理</span>
-        </template>
-        <el-menu-item index="/pro/list">商品列表</el-menu-item>
-        <el-menu-item index="/pro/add">商品添加</el-menu-item>
-        <el-menu-item index="/pro/cate">商品分类</el-menu-item>
-      </el-submenu>
-      <el-menu-item index="/shop">
-        <i class="iconfont icon-dianpu"></i>
-        <span slot="title">店铺管理</span>
-      </el-menu-item>
-      <el-submenu index="/account">
-        <template slot="title">
-          <i class="iconfont icon-zhanghao"></i>
-          <span>账号管理</span>
-        </template>
-        <el-menu-item index="/account/list">账号列表</el-menu-item>
-        <el-menu-item index="/account/add">添加账号</el-menu-item>
-        <el-menu-item index="/account/reset">修改密码</el-menu-item>
-      </el-submenu>
-      <el-submenu index="/sellcount">
-        <template slot="title">
-          <i class="iconfont icon-tongji"></i>
-          <span>销售统计</span>
-        </template>
-        <el-menu-item index="/sellcount/goods">商品统计</el-menu-item>
-        <el-menu-item index="/sellcount/order">订单统计</el-menu-item>
-      </el-submenu>
+      <template v-for="item in menu">
+        <el-menu-item
+          v-if="!item.children || item.path === '/order'"
+          :index="item.path === '/order' ? '/order/list' : item.path"
+          :key="item.path"
+        >
+          <i class="iconfont" :class="item.meta.icon"></i>
+          <span slot="title">{{ item.meta.name }}</span>
+        </el-menu-item>
+        <el-submenu v-else :index="item.path" :key="item.path">
+          <template slot="title">
+            <i class="iconfont" :class="item.meta.icon"></i>
+            <span>{{ item.meta.name }}</span>
+          </template>
+          <el-menu-item
+            :index="sub.path"
+            v-for="sub in item.children"
+            :key="sub.path"
+            >{{ sub.meta.name }}</el-menu-item
+          >
+        </el-submenu>
+      </template>
     </el-menu>
   </div>
 </template>
 
 <script>
+import { local } from '../../utils/local.js'
 export default {
+  created() {
+    this.menu = JSON.parse(local.get('menu'))
+  },
+  data() {
+    return {
+      menu: {}
+    }
+  },
   methods: {
     handleOpen(key, keyPath) {
       console.log(key, keyPath)
@@ -68,6 +61,17 @@ export default {
     isCollapse: {
       type: Boolean,
       default: false
+    }
+  },
+  computed: {
+    celpath() {
+      if (this.$route.path.includes('pro/edit')) {
+        return '/pro/list'
+      } else if (this.$route.path.includes('order/edit')) {
+        return '/order/list'
+      } else {
+        return this.$route.path
+      }
     }
   }
 }

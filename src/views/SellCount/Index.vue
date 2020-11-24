@@ -1,6 +1,5 @@
 <template>
   <div>
-    sell index
     <router-view></router-view>
   </div>
 </template>

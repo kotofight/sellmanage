@@ -6,6 +6,9 @@ import './assets/css/reset.css'
 import 'element-ui/lib/theme-chalk/index.css'
 import './assets/css/index.less'
 import './assets/fonts/iconfont.css'
+import './utils/components.js'
+import './utils/filter.js'
+
 Vue.use(ElementUI)
 
 Vue.config.productionTip = false

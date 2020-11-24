@@ -1,5 +1,7 @@
 <template>
-  <div>order</div>
+  <div>
+    <router-view></router-view>
+  </div>
 </template>
 
 <script>

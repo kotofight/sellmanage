@@ -37,17 +37,21 @@ export default {
 <style  lang="less">
 .el-container {
   height: 100%;
+  // background-color: pink;
+  background: url('../assets/images/b3_01.jpg') no-repeat;
+  background-size: cover;
 }
 .el-header {
+  background-color: rgba(255, 255, 255, 0.6);
   padding-top: 10px !important;
 }
 
 .el-aside {
-  background-color: #304156;
+  background-color: #3a6f9c;
 }
 
 .el-main {
-  background-color: #73b7fb;
+  // background-color: #73b7fb;
   // background: url('../assets/images/b2.jpeg') no-repeat;
   // background-size: cover;
 }

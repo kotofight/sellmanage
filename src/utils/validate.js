@@ -1,5 +1,5 @@
 const reg1 = /^([a-zA-Z0-9_-]|[\u4E00-\u9FA5]){3,13}$/
-const reg2 = /^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z\\W]{6,18}$/
+const reg2 = /^([a-zA-Z0-9_-]){3,13}$/
 
 export function validateUsername(rule, value, callback) {
   if (value === '') {
@@ -14,7 +14,7 @@ export function validatePwd(rule, value, callback) {
   if (value === '') {
     callback(new Error('请输入密码'))
   } else if (!reg2.test(value)) {
-    callback(new Error('请输入6-18位密码，且必须同时包含字母和数字'))
+    callback(new Error('请输入3-13位密码，且必须同时包含字母和数字'))
   } else {
     callback()
   }
@@ -25,7 +25,7 @@ export function validateNewPass(o) {
     if (value === '') {
       callback(new Error('请输入新密码'))
     } else if (!reg2.test(value)) {
-      callback(new Error('请输入6-18位密码，且必须同时包含字母和数字'))
+      callback(new Error('请输入3-13位密码，且必须同时包含字母和数字'))
     } else {
       if (o.passForm.checkPass !== '') {
         o.$refs.passForm.validateField('checkPass')

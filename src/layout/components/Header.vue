@@ -13,7 +13,8 @@
     <div class="header-right">
       <el-dropdown trigger="click" @command="handleCommand">
         <span class="el-dropdown-link">
-          欢迎你，小飞飞<i class="el-icon-arrow-down el-icon--right"></i>
+          欢迎你，{{ user.account
+          }}<i class="el-icon-arrow-down el-icon--right"></i>
         </span>
         <el-dropdown-menu slot="dropdown">
           <el-dropdown-item command="personal">个人中心</el-dropdown-item>
@@ -21,31 +22,33 @@
         </el-dropdown-menu>
       </el-dropdown>
       <div class="block">
-        <el-avatar
-          :size="40"
-          :src="require('../../assets/images/head.jpg')"
-        ></el-avatar>
+        <el-avatar :size="40" :src="user.imgUrl"></el-avatar>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import { local } from '../../utils/local.js'
+import { getPersonal } from '../../Api/users.js'
 export default {
   created() {
     this.changeBreadcrumb()
+    this.getPersonalInfo()
   },
   data() {
     return {
-      listArr: []
+      listArr: [],
+      user: {}
     }
   },
   methods: {
     handleCommand(c) {
       if (c === 'personal') {
-        console.log('个人中心')
+        this.$router.push('/account/personal')
       } else if (c === 'exit') {
-        this.$router.push('/login')
+        local.clear()
+        location.reload()
       }
     },
     changeBreadcrumb() {
@@ -59,6 +62,14 @@ export default {
         }
       })
       this.listArr = arr
+    },
+    async getPersonalInfo() {
+      const data = await getPersonal()
+      local.set('user', JSON.stringify(data.accountInfo))
+      await this.getInfo()
+    },
+    getInfo() {
+      this.user = JSON.parse(local.get('user'))
     }
   },
   watch: {

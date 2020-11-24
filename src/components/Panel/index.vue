@@ -16,6 +16,10 @@ export default {}
 <style lang="less" scoped>
 /deep/ .el-card__body {
   padding: 0;
+  background-color: rgba(255, 255, 255, 0.2);
+}
+.el-card {
+  background-color: rgba(255, 255, 255, 0.7);
 }
 .panel-header {
   padding: 20px;

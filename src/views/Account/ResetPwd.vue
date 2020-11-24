@@ -16,6 +16,7 @@
               type="password"
               v-model="passForm.oldPass"
               autocomplete="off"
+              @blur="checkOld"
             ></el-input>
           </el-form-item>
           <el-form-item label="新密码" prop="pwd">
@@ -33,10 +34,15 @@
             ></el-input>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" @click="submitForm('passForm')"
+            <el-button
+              type="primary"
+              @click="submitForm('passForm')"
+              size="mini"
               >确认</el-button
             >
-            <el-button @click="resetForm('passForm')">重置</el-button>
+            <el-button @click="resetForm('passForm')" size="mini"
+              >重置</el-button
+            >
           </el-form-item>
         </el-form>
       </template>
@@ -45,18 +51,17 @@
 </template>
 
 <script>
-import Panel from '../../components/Panel/index'
+import { oldPass, emitPass } from '../../Api/users.js'
+import { local } from '../../utils/local.js'
 import {
   validatePwd,
   validateCheckPass,
   validateNewPass
-} from '../../until/validate.js'
+} from '../../utils/validate.js'
 export default {
-  components: {
-    Panel
-  },
   data() {
     return {
+      canEmit: false,
       passForm: {
         oldPass: '',
         pwd: '',
@@ -70,10 +75,27 @@ export default {
     }
   },
   methods: {
+    async checkOld() {
+      const data = await oldPass({
+        oldPwd: this.passForm.oldPass
+      })
+      if (data.code === '00') {
+        this.canEmit = true
+      }
+    },
     submitForm(formName) {
-      this.$refs[formName].validate((valid) => {
+      this.$refs[formName].validate(async (valid) => {
         if (valid) {
-          alert('submit!')
+          // alert('submit!')
+          if (this.canEmit) {
+            const data = await emitPass({
+              newPwd: this.passForm.pwd
+            })
+            if (data.code === 0) {
+              this.$router.push('/login')
+              local.remove('token')
+            }
+          }
         } else {
           console.log('error submit!!')
           return false
@@ -90,5 +112,27 @@ export default {
 <style lang="less" scoped>
 .el-form {
   width: 400px;
+}
+/deep/.el-form-item {
+  .el-input {
+    width: 200px;
+    background-color: rgba(255, 255, 255, 0.2);
+    input {
+      background-color: rgba(255, 255, 255, 0.2) !important;
+    }
+  }
+
+  .el-input__inner {
+    background-color: rgba(255, 255, 255, 0.2) !important;
+    input {
+      background-color: rgba(255, 255, 255, 0.2) !important;
+    }
+  }
+  .el-textarea {
+    textarea {
+      background-color: rgba(255, 255, 255, 0.2) !important;
+    }
+    width: 400px;
+  }
 }
 </style>

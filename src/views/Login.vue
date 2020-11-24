@@ -24,6 +24,7 @@
             v-model="loginForm.pwd"
             autocomplete="off"
             prefix-icon="iconfont icon-mima"
+            @keyup.native.13.once="submitForm('loginForm')"
           >
             <template #suffix>
               <i
@@ -39,6 +40,7 @@
             type="primary"
             class="login-btn"
             @click="submitForm('loginForm')"
+            :loading="islog"
             >登录</el-button
           >
         </el-form-item>
@@ -48,10 +50,13 @@
 </template>
 
 <script>
+import { login } from '../Api/users.js'
+import { local } from '../utils/local.js'
+import { createRoute } from '../router/index.js'
 export default {
   data() {
     const reg1 = /^([a-zA-Z0-9_-]|[\u4E00-\u9FA5]){3,13}$/
-    const reg2 = /^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z\\W]{6,18}$/
+    const reg2 = /^([a-zA-Z0-9_-]){3,13}$/
     var validateUsername = (rule, value, callback) => {
       if (value === '') {
         callback(new Error('请输入用户名'))
@@ -67,12 +72,13 @@ export default {
       if (value === '') {
         callback(new Error('请输入密码'))
       } else if (!reg2.test(value)) {
-        callback(new Error('请输入6-18位密码，且必须同时包含字母和数字'))
+        callback(new Error('请输入3-13位密码'))
       } else {
         callback()
       }
     }
     return {
+      islog: false,
       flag: false,
       loginForm: {
         username: '',
@@ -86,11 +92,28 @@ export default {
   },
   methods: {
     submitForm(formName) {
-      this.$refs[formName].validate((valid) => {
+      this.islog = true
+      this.$refs[formName].validate(async (valid) => {
         if (valid) {
-          alert('submit!')
+          // alert('submit!')
+          const data = await login({
+            account: this.loginForm.username,
+            password: this.loginForm.pwd
+          })
+          if (data.code === 0) {
+            setTimeout(() => {
+              local.set('token', data.token)
+              local.set('role', data.role)
+
+              createRoute()
+              this.$router.push('/')
+            }, 3000)
+          } else if (data.code === 1) {
+            this.islog = false
+          }
         } else {
           console.log('error submit!!')
+          this.islog = false
           return false
         }
       })
@@ -105,9 +128,9 @@ export default {
 <style lang="less" scoped>
 .login {
   height: 100%;
-  background-color: rgb(10, 54, 72);
-  // background: url('../assets/images/b3.jpg');
-  // background-size: cover;
+  // background-color: rgb(10, 54, 72);
+  background: url('../assets/images/b3_01.jpg') no-repeat;
+  background-size: cover;
   display: flex;
   justify-content: center;
   align-items: center;

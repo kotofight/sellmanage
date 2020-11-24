@@ -1,7 +1,7 @@
 <template>
   <div>
     <Panel>
-      <template #header>商品添加 </template>
+      <template #header>商品编辑</template>
       <template #content>
         <el-form ref="form" :model="form" label-width="80px">
           <el-form-item label="商品名称">
@@ -33,7 +33,8 @@
               :on-preview="handlePictureCardPreview"
               :on-remove="handleRemove"
             >
-              <i class="el-icon-plus"></i>
+              <img v-if="imageUrl" :src="imageUrl" class="avatar" />
+              <i v-else class="el-icon-plus"></i>
             </el-upload>
             <el-dialog :visible.sync="dialogVisible">
               <img width="100%" :src="dialogImageUrl" alt="" />
@@ -43,7 +44,7 @@
             <el-input type="textarea" v-model="form.desc"></el-input>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" size="mini" @click="addCate"
+            <el-button type="primary" size="mini" @click="editProduct"
               >保存</el-button
             >
           </el-form-item>
@@ -54,13 +55,11 @@
 </template>
 
 <script>
-import { getProCate, addPro } from '../../Api/pro.js'
+import { getGoods, getProCate, editPro } from '../../Api/pro.js'
 export default {
-  created() {
-    this.getCate()
-  },
   data() {
     return {
+      id: this.$route.params.id,
       form: {
         name: '',
         region: '',
@@ -73,10 +72,29 @@ export default {
       num: 1,
       dialogImageUrl: '',
       dialogVisible: false,
-      imgUrl: ''
+      imgUrl: '',
+      imageUrl: '',
+      baseUrl: 'http://127.0.0.1:5000/upload/imgs/goods_img/'
     }
   },
+  created() {
+    console.log(this.$route.params.id)
+    this.getPro()
+    this.getCate()
+  },
   methods: {
+    async getPro() {
+      const { data } = await getGoods({
+        id: this.id
+      })
+      console.log(data[0])
+      this.form.name = data[0].name
+      this.num = data[0].price
+      this.form.desc = data[0].goodsDesc
+      this.form.region = data[0].category
+      this.imgUrl = data[0].imgUrl
+      this.imageUrl = this.baseUrl + data[0].imgUrl
+    },
     onSubmit() {
       console.log('submit!')
     },
@@ -98,13 +116,14 @@ export default {
       const { categories } = await getProCate()
       this.cate = categories
     },
-    async addCate() {
-      const data = await addPro({
+    async editProduct() {
+      const data = await editPro({
         name: this.form.name,
         category: this.form.region,
         price: this.num,
         imgUrl: this.imgUrl,
-        goodsDesc: this.form.desc
+        goodsDesc: this.form.desc,
+        id: this.id
       })
       if (data.code === 0) {
         this.$router.push('/pro/list')

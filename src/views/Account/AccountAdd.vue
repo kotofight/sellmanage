@@ -25,7 +25,7 @@
               autocomplete="off"
             ></el-input>
           </el-form-item>
-          <el-form-item label="年龄" prop="selectVal">
+          <el-form-item label="用户组" prop="selectVal">
             <el-select v-model="ruleForm.selectVal" placeholder="请选择">
               <el-option
                 v-for="item in options"
@@ -49,12 +49,9 @@
 </template>
 
 <script>
-import Panel from '../../components/Panel/index'
-import { validateUsername, validatePwd } from '../../until/validate.js'
+import { validateUsername, validatePwd } from '../../utils/validate.js'
+import { userAdd } from '../../Api/users.js'
 export default {
-  components: {
-    Panel
-  },
   data() {
     var validateSelectVal = (rule, value, callback) => {
       if (value === '') {
@@ -88,9 +85,17 @@ export default {
   },
   methods: {
     submitForm(formName) {
-      this.$refs[formName].validate((valid) => {
+      this.$refs[formName].validate(async (valid) => {
         if (valid) {
-          alert('submit!')
+          // alert('submit!')
+          const data = await userAdd({
+            account: this.ruleForm.username,
+            password: this.ruleForm.pwd,
+            userGroup: this.ruleForm.selectVal
+          })
+          if (data.code === 0) {
+            this.$router.push('/account/list')
+          }
         } else {
           console.log('error submit!!')
           return false
@@ -107,5 +112,27 @@ export default {
 <style lang="less" scoped>
 .el-form {
   width: 400px;
+}
+/deep/.el-form-item {
+  .el-input {
+    width: 200px;
+    background-color: rgba(255, 255, 255, 0.2);
+    input {
+      background-color: rgba(255, 255, 255, 0.2) !important;
+    }
+  }
+
+  .el-input__inner {
+    background-color: rgba(255, 255, 255, 0.2) !important;
+    input {
+      background-color: rgba(255, 255, 255, 0.2) !important;
+    }
+  }
+  .el-textarea {
+    textarea {
+      background-color: rgba(255, 255, 255, 0.2) !important;
+    }
+    width: 400px;
+  }
 }
 </style>
